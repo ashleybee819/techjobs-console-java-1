@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class JobData {
 
-    private static final String DATA_FILE = "resources/job_data.csv";
+    private static final String DATA_FILE = "techjobs-console-java-1/resources/job_data.csv";
     private static Boolean isDataLoaded = false;
 
     private static ArrayList<HashMap<String, String>> allJobs;
@@ -51,7 +51,10 @@ public class JobData {
         // load data, if not already loaded
         loadData();
 
-        return allJobs;
+        ArrayList<HashMap<String, String>> listOfJobs = new ArrayList<>();
+        listOfJobs.addAll(allJobs);
+
+        return listOfJobs;
     }
 
     /**
@@ -69,14 +72,14 @@ public class JobData {
 
         // load data, if not already loaded
         loadData();
+        String upperCaseValue = value.toUpperCase();
 
         ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
 
         for (HashMap<String, String> row : allJobs) {
-
             String aValue = row.get(column);
 
-            if (aValue.contains(value)) {
+            if (aValue.toUpperCase().contains(upperCaseValue)) {
                 jobs.add(row);
             }
         }
@@ -100,7 +103,7 @@ public class JobData {
             Reader in = new FileReader(DATA_FILE);
             CSVParser parser = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(in);
             List<CSVRecord> records = parser.getRecords();
-            Integer numberOfColumns = records.get(0).size();
+            int numberOfColumns = records.get(0).size();
             String[] headers = parser.getHeaderMap().keySet().toArray(new String[numberOfColumns]);
 
             allJobs = new ArrayList<>();
@@ -123,6 +126,22 @@ public class JobData {
             System.out.println("Failed to load job data");
             e.printStackTrace();
         }
+    }
+
+    public static ArrayList<HashMap<String, String>> findByValue(String searchTerm) {
+        loadData();
+
+        ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
+        String upperCaseSearchTerm = searchTerm.toUpperCase();
+        for (HashMap<String, String> row: allJobs) {
+            for (String value: row.values()) {
+                if (value.toUpperCase().contains(upperCaseSearchTerm)) {
+                    jobs.add(row);
+                    break;
+                }
+            }
+        }
+        return jobs;
     }
 
 }
